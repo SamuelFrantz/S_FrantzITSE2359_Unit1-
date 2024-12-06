@@ -1,0 +1,12 @@
+Train Scheduling System
+Overview
+
+The Train Scheduling System is a C++ program designed to manage train schedules and completed routes using a queue, stack, and file persistence. It allows users to:
+
+Add trains to a schedule (queue).
+View the next train in the schedule.
+Mark train routes as completed (stack).
+View completed train routes.
+Save and restore data across program sessions.
+
+This program is ideal for demonstrating data structure usage in practical applications like scheduling and tracking.

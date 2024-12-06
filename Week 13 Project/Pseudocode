@@ -1,0 +1,109 @@
+START
+
+DECLARE trainQueue AS queue of strings
+DECLARE completedRoutes AS stack of strings
+SET trainQueueFile = "train_queue.txt"
+SET completedRoutesFile = "completed_routes.txt"
+
+CALL loadQueue(trainQueue, trainQueueFile)
+CALL loadStack(completedRoutes, completedRoutesFile)
+
+DO
+    DISPLAY "--- Train Scheduling System ---"
+    DISPLAY "1. Add Train to Schedule"
+    DISPLAY "2. View Next Train"
+    DISPLAY "3. Complete Train Route"
+    DISPLAY "4. View Completed Routes"
+    DISPLAY "5. Save and Exit"
+    PROMPT user for choice
+
+    SWITCH choice
+        CASE 1:
+            PROMPT "Enter train details: "
+            READ train
+            ENQUEUE train TO trainQueue
+            DISPLAY "Train added to schedule."
+        CASE 2:
+            IF trainQueue IS NOT EMPTY THEN
+                DISPLAY "Next train in schedule: " + FRONT(trainQueue)
+            ELSE
+                DISPLAY "No trains in the schedule."
+            ENDIF
+        CASE 3:
+            IF trainQueue IS NOT EMPTY THEN
+                SET completedTrain = DEQUEUE trainQueue
+                PUSH completedTrain TO completedRoutes
+                DISPLAY "Train completed: " + completedTrain
+            ELSE
+                DISPLAY "No trains to complete."
+            ENDIF
+        CASE 4:
+            IF completedRoutes IS NOT EMPTY THEN
+                DISPLAY "Completed train routes:"
+                CALL displayStack(completedRoutes)
+            ELSE
+                DISPLAY "No completed routes."
+            ENDIF
+        CASE 5:
+            CALL saveQueue(trainQueue, trainQueueFile)
+            CALL saveStack(completedRoutes, completedRoutesFile)
+            DISPLAY "Data saved. Exiting..."
+        DEFAULT:
+            DISPLAY "Invalid choice. Please try again."
+    ENDSWITCH
+WHILE choice != 5
+
+END
+
+FUNCTION loadQueue(queue, filename)
+    OPEN filename FOR READING
+    WHILE NOT EOF(filename)
+        READ line
+        ENQUEUE line TO queue
+    ENDWHILE
+    CLOSE file
+ENDFUNCTION
+
+FUNCTION saveQueue(queue, filename)
+    OPEN filename FOR WRITING
+    WHILE queue IS NOT EMPTY
+        WRITE FRONT(queue) TO file
+        DEQUEUE queue
+    ENDWHILE
+    CLOSE file
+ENDFUNCTION
+
+FUNCTION loadStack(stack, filename)
+    DECLARE tempStack AS stack of strings
+    OPEN filename FOR READING
+    WHILE NOT EOF(filename)
+        READ line
+        PUSH line TO tempStack
+    ENDWHILE
+    CLOSE file
+    WHILE tempStack IS NOT EMPTY
+        PUSH TOP(tempStack) TO stack
+        POP tempStack
+    ENDWHILE
+ENDFUNCTION
+
+FUNCTION saveStack(stack, filename)
+    DECLARE tempStack AS stack of strings
+    WHILE stack IS NOT EMPTY
+        PUSH TOP(stack) TO tempStack
+        POP stack
+    ENDWHILE
+    OPEN filename FOR WRITING
+    WHILE tempStack IS NOT EMPTY
+        WRITE TOP(tempStack) TO file
+        POP tempStack
+    ENDWHILE
+    CLOSE file
+ENDFUNCTION
+
+FUNCTION displayStack(stack)
+    WHILE stack IS NOT EMPTY
+        DISPLAY TOP(stack)
+        POP stack
+    ENDWHILE
+ENDFUNCTION
